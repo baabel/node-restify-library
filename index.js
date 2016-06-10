@@ -1,5 +1,5 @@
 'use strict'
-/*
+/**
  Abstraction of a REST api.  Handles the http protocol.
  Clients are passed objects from the request and
  return a payload and success indicator.
@@ -11,8 +11,12 @@
 
 */
 
+
 import Restify from 'restify';
 
+/**
+RestServer
+*/
 
 class RestServer {
 
@@ -39,10 +43,14 @@ httpsServerOptions	Object	Any options accepted by node-https Server.
 authHandler		function 	A function that handles the authentication process.
 
 */
-	constructor(options) {
+	constructor(options = {port:3000, name: 'restapi'}) {
 		this.server = null;
+		this.port = 3000;
 		this.authHandler = options.authHandler;
 		this._create(options);
+		if(options.routes) {
+			this._setRoutes(options.routes);
+		}
 	}
 
 /*
@@ -52,7 +60,8 @@ authHandler		function 	A function that handles the authentication process.
 
 */
 	_create(options) {
-		this.server = restify.createServer(this.options);
+		this.port = options.port;
+		this.server = Restify.createServer(this.options);
 		// auth handler hook
 		if(typeof(this.authHandler) === "function") {
 			this.server.use((req, res, next) => {
@@ -65,6 +74,35 @@ authHandler		function 	A function that handles the authentication process.
 			});
 		}
 	}
+	/**
+		sets routes from a given array of routes
+
+	*/
+
+	_setRoutes(routes) {
+
+		if(!Array.isArray(routes)) throw new Error('illegal argument routes.');
+
+		routes.map( route => {
+
+			if(!typeof(route.handler) === 'function') return;
+			if(!typeof(route.type) === 'string') return;
+			switch(route.type) {
+				case 'GET':
+					this.get(route.url, route.handler);
+					break;
+				case 'POST':
+					this.post(route.url, route.handler);
+					break;
+				case 'DELETE':
+					this.del(route.url, route.handler);
+					break;
+				case 'PUT':
+					this.put(router.url, route.handler);
+					break;
+			}
+		});
+	}
 
 /*
 start
@@ -74,7 +112,7 @@ Starts the rest server
 */
 	start() {
 		if(this.server == null) create();
-		this.server.listen(config.port, () => () => console.log('%s listening at %s', server.name, server.url));
+		this.server.listen(this.port, () => () => console.log('%s listening at %s', server.name, server.url));
 	}
 
 /*
@@ -84,7 +122,7 @@ Adds a handler to GET requests for a give URL
 */
 	get(url, callback) {
 		
-		server.get(url, (req, res, next) => {
+		this.server.get(url, (req, res, next) => {
 			callback(req.body, (apiResponse) => {
 				this._processResult(res, apiResponse);
 				return next();
@@ -98,7 +136,7 @@ Adds a handler to POST for a give URL
 
 */
 	post(url, callback) {
-		server.post(url,(req, res, next) => {
+		this.server.post(url,(req, res, next) => {
 			callback(req.body, (apiResponse) => {
 				this._processResult(res, apiResponse);
 				return next();
@@ -111,7 +149,7 @@ Adds a handler to PUT for a give URL
 
 */
 	put(url, callback) {
-		server.put(url, (req, res, next) => {
+		this.server.put(url, (req, res, next) => {
 			callback(req.body, (apiResponse) => {
 				this._processResult(res, apiResponse);
 				return next();
@@ -125,7 +163,7 @@ Adds a handler to DELETE for a give URL
 
 */
 	del(url, callback) {
-		server.del(url, (req, res, next) => {
+		this.server.del(url, (req, res, next) => {
 			callback(req.body, (apiResponse) => {
 				this._processResult(res, apiResponse);
 				return next();
