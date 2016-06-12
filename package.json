@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Library to use for bootstrapping a node rest api.",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "restify": "^4.1.0"
+  },
   "devDependencies": {
     "babel-core": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
