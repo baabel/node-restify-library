@@ -40,12 +40,12 @@ handleUpgrades      Boolean       Hook the upgrade event from the node HTTP serv
                                   pushing Connection: Upgrade requests through the regular request handling chain; defaults to false
 httpsServerOptions  Object        Any options accepted by node-https Server.
                                   If provided the following restify server options will be ignored: spdy, ca, certificate, key, passphrase, rejectUnauthorized, requestCert and ciphers; however these can all be specified on httpsServerOptions.
-authHandler         function  A function that handles the authentication process.
+authHandler         function      A function that handles the authentication process.
+routes              array         Array of routes for the rest interface
 
 */
   constructor(options = {port:3000, name: 'restapi'}) {
     this.server = null;
-    this.port = 3000;
     this.authHandler = options.authHandler;
     this._create(options);
     if(options.routes) {
@@ -111,7 +111,6 @@ Starts the rest server
 
 */
   start() {
-    if(this.server == null) create();
     this.server.listen(this.port, () => () => console.log('%s listening at %s', server.name, server.url));
   }
 
