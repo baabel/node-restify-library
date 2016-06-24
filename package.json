@@ -2,18 +2,24 @@
   "name": "node-restify-library",
   "version": "1.0.0",
   "description": "Library to use for bootstrapping a node rest api.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "dependencies": {
     "restify": "^4.1.0"
   },
   "devDependencies": {
-    "babel-core": "^6.9.1",
+    "babel-cli": "^6.10.1",
+    "babel-core": "^6.10.4",
     "babel-preset-es2015": "^6.9.0",
     "chai": "^3.5.0",
     "mocha": "^2.5.3"
   },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublish": "node_modules/babel-cli/bin/babel.js index.js --out-dir lib"
   },
   "author": "",
   "license": "ISC"
