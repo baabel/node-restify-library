@@ -175,7 +175,7 @@ Adds a handler to DELETE for a give URL
   General processing of hanler responses
 */
   _processResult(httpRes, apiResponse) {
-
+      httpRes.send(apiResponse);
   }
 }
 
