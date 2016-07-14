@@ -122,7 +122,7 @@ Adds a handler to GET requests for a give URL
   get(url, callback) {
     
     this.server.get(url, (req, res, next) => {
-      callback(req.body, (apiResponse) => {
+      callback(Object.assign(req.params, req.query), (apiResponse) => {
         this._processResult(res, apiResponse);
         return next();
       });
