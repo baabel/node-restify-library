@@ -62,6 +62,7 @@ routes              array         Array of routes for the rest interface
   _create(options) {
     this.port = options.port;
     this.server = Restify.createServer(this.options);
+    server.use(restify.queryParser());
     // auth handler hook
     if(typeof(this.authHandler) === "function") {
       this.server.use((req, res, next) => {
@@ -111,6 +112,7 @@ Starts the rest server
 
 */
   start() {
+
     this.server.listen(this.port, () => () => console.log('%s listening at %s', server.name, server.url));
   }
 
@@ -122,8 +124,8 @@ Adds a handler to GET requests for a give URL
   get(url, callback) {
     
     this.server.get(url, (req, res, next) => {
-      callback(Object.assign(req.params, req.query), (apiResponse) => {
-        this._processResult(res, apiResponse);
+      callback(Object.assign(req.params, req.query), (error, apiResponse) => {
+        this._processResult(error, res, apiResponse);
         return next();
       });
     });
@@ -136,8 +138,8 @@ Adds a handler to POST for a give URL
 */
   post(url, callback) {
     this.server.post(url,(req, res, next) => {
-      callback(req.body, (apiResponse) => {
-        this._processResult(res, apiResponse);
+      callback(req.body, (error, apiResponse) => {
+        this._processResult(res, error, apiResponse);
         return next();
       });
     });
@@ -149,8 +151,8 @@ Adds a handler to PUT for a give URL
 */
   put(url, callback) {
     this.server.put(url, (req, res, next) => {
-      callback(req.body, (apiResponse) => {
-        this._processResult(res, apiResponse);
+      callback(req.body, (error, apiResponse) => {
+        this._processResult(res, error, apiResponse);
         return next();
       });
     });
@@ -163,8 +165,8 @@ Adds a handler to DELETE for a give URL
 */
   del(url, callback) {
     this.server.del(url, (req, res, next) => {
-      callback(req.body, (apiResponse) => {
-        this._processResult(res, apiResponse);
+      callback(req.body, (error, apiResponse) => {
+        this._processResult(res, error, apiResponse);
         return next();
       });
     });
@@ -174,9 +176,16 @@ Adds a handler to DELETE for a give URL
 
   General processing of hanler responses
 */
-  _processResult(httpRes, apiResponse) {
-      httpRes.send(apiResponse);
+  _processResult(httpRes, error, apiResponse) {
+    if(error) {
+      httpRes.send(500, error.message);
+    } else httpRes.send(apiResponse);
   }
 }
 
 export default RestServer;
+
+export const ErrorTypes = {
+  Authorization: Symbol("REST:Authorization"),
+  Server: Symbol("REST:Server")
+}
